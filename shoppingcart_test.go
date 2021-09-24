@@ -9,63 +9,36 @@ import (
 	"github.com/go-playground/assert"
 )
 
-func TestFullScenario(t *testing.T) {
-	expected := "Green Banana (2)\nRed Apple (7)\n"
-
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cart := shoppingcart.Cart{}
-
-	cart.AddProduct("Green Banana", 2)
-
-	cart.AddProduct("Yellow Watermelon", 3)
-
-	cart.AddProduct("Red Apple", 1)
-	cart.AddProduct("Red Apple", 4)
-	cart.AddProduct("Red Apple", 2)
-
-	cart.RemoveProduct("Yellow Watermelon")
-
-	cart.RemoveProduct("Red Watermelon")
-
-	cart.PrintCart()
-
-	w.Close()
-	out, _ := ioutil.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	assert.Equal(t, expected, string(out))
-}
+var (
+	cart = &shoppingcart.Cart{
+		"Mango": 2,
+		"Apple": 3,
+	}
+)
 
 func TestAddProduct(t *testing.T) {
 	expected := &shoppingcart.Cart{
 		"Mango": 2,
 		"Apple": 3,
+		"Melon": 4,
 	}
 
-	cart := shoppingcart.Cart{}
-
-	cart.AddProduct("Mango", 2)
-	cart.AddProduct("Apple", 3)
+	cart.AddProduct("Melon", 4)
 
 	assert.Equal(t, expected, cart)
 }
 
 func TestRemoveProduct(t *testing.T) {
-	expected := &shoppingcart.Cart{
-		"Mango": 2,
-	}
+	err := cart.RemoveProduct("Mango")
 
-	cart := shoppingcart.Cart{}
+	assert.Equal(t, nil, err)
+}
 
-	cart.AddProduct("Mango", 2)
-	cart.AddProduct("Apple", 3)
+func TestRemoveNotListedProduct(t *testing.T) {
+	expected := "product is not listed"
+	err := cart.RemoveProduct("Orange")
 
-	cart.RemoveProduct("Apple")
-
-	assert.Equal(t, expected, cart)
+	assert.Equal(t, expected, err.Error())
 }
 
 func TestPrintCart(t *testing.T) {
@@ -74,11 +47,6 @@ func TestPrintCart(t *testing.T) {
 	rescueStdout := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
-
-	cart := shoppingcart.Cart{}
-
-	cart.AddProduct("Mango", 2)
-	cart.AddProduct("Apple", 3)
 
 	cart.PrintCart()
 

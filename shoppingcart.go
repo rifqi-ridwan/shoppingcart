@@ -1,6 +1,9 @@
 package shoppingcart
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type Cart map[string]int
 
@@ -12,8 +15,13 @@ func (c Cart) AddProduct(productCode string, quantity int) {
 	}
 }
 
-func (c Cart) RemoveProduct(productCode string) {
-	delete(c, productCode)
+func (c Cart) RemoveProduct(productCode string) error {
+	if _, ok := c[productCode]; ok {
+		delete(c, productCode)
+		return nil
+	} else {
+		return errors.New("product is not listed")
+	}
 }
 
 func (c Cart) PrintCart() {
